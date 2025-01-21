@@ -81,10 +81,12 @@ class CursoApp:
         try:
             response = requests.post(API_URL, json=data)
             if response.status_code == 200:
-                messagebox.showinfo("Sucesso", "Curso adicionado com sucesso!")
-                self.listar_cursos()
-            else:
-                messagebox.showerror("Erro", f"Erro ao adicionar curso: {response.text}")
+                result = response.json()
+                if "error" in result:  
+                    messagebox.showerror("Erro", result["error"])
+                else:
+                    messagebox.showinfo("Sucesso", "Curso adicionado com sucesso!")
+                    self.listar_cursos()
         except requests.exceptions.RequestException as e:
             messagebox.showerror("Erro", f"Erro na comunicação com a API: {e}")
 

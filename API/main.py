@@ -26,18 +26,21 @@ async def listarCursos():
 @app.post("/cursos")
 async def criarCurso(curso: Curso):
     
+    verificar_existencia = "SELECT * FROM cursos WHERE title = ?"
     requisicao = f"""
             INSERT INTO cursos (title, description, ch) 
             VALUES (?, ?, ?);
         """
     
     try:
+        cursor.execute(verificar_existencia, (curso.title, ))
+        if cursor.fetchone():
+            raise Exception(f"Curso com título '{curso.title}' já existe.")
         cursor.execute(requisicao, (curso.title, curso.description, curso.ch))
         conexao.commit()
         return {"message": f"Curso '{curso.title}' adicionado com sucesso!"} 
-    
     except Exception as e:
-        return {"error": e}    
+        return {"error": str(e)}    
 
 @app.get("/cursos/{id}")
 async def detalhesCurso(id: int):
